@@ -1,0 +1,14 @@
+pipeline
+{
+    agent any
+    stages
+    {
+        stage ('please execute commane')
+        {
+            steps
+            {
+                sh 'echo hello' 
+            }
+        }
+    }
+} 
