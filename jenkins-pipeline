@@ -3,11 +3,76 @@ pipeline
     agent any
     stages
     {
-        stage ('please execute commane')
+        stage ('scm checkout')
         {
             steps
             {
-                sh 'echo hello' 
+                git branch: 'master', url: 'https://github.com/kdadhikari/maven-project'
+            }
+        }
+        stage ('compile source code')
+        {
+            steps
+            {
+                withMaven(jdk: 'localjdk-8', maven: 'Local Maven') 
+                {
+                    sh 'mvn compile'
+                }
+            }
+        }
+        stage ('test')
+        {
+            steps
+            {
+                withMaven(jdk: 'localjdk-8', maven: 'Local Maven') 
+                {
+                    sh 'mvn test'
+                }
+
+            }
+        }
+        stage ('package')
+        {
+            steps
+            {
+                withMaven(jdk: 'localjdk-8', maven: 'Local Maven') 
+                {
+                    sh 'mvn package'
+                }
+
+            }
+        }
+        stage ('verify')
+        {
+            steps
+            {
+                withMaven(jdk: 'localjdk-8', maven: 'Local Maven') 
+                {
+                    sh 'mvn verify'
+                }
+
+            }
+        }
+        stage ('install')
+        {
+            steps
+            {
+                withMaven(jdk: 'localjdk-8', maven: 'localmvn') 
+                {
+                    sh 'mvn install'
+                }
+
+            }
+        }
+        stage ('tomcat deployment')
+        {
+            steps
+            {
+                sshagent(['deploytomcat']) 
+                {
+                    sh 'scp -o StrictHostKeyChecking=no */target/*.war ec2-user@172.31.20.127:/var/lib/tomcat/webapps'
+                }
+
             }
         }
     }
